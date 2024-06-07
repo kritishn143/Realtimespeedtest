@@ -28,14 +28,14 @@
         Your browser does not support the video tag.
     </video>
     
-    
+
 
     <script>
         let fetchingSpeedHeaderShown = false;
 
         async function fetchSpeed() {
             try {
-                const response = await fetch('http://localhost:3000/run-speed-test');
+                const response = await fetch('https://realtimespeedtest.onrender.com/run-speed-test');
                 const data = await response.json();
 
                 const downloadSpeedElement = document.getElementById('downloadSpeed');
