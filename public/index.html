@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Internet Speed</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <div class="speed-info">
+        <h1>Real Time Speed Test</h1>
+        <div id="downloadSpeed" class="spinner"></div>
+        <!-- Initially hide the "Show more info" button -->
+        <button class="show-more-info" id="showMoreInfoBtn" style="display: none" onclick="toggleSpeedDetails()">Show more info</button>
+       
+    </div>
+    <div class="speed-details" id="speedDetails" style="display: none">
+        <h2>Download Speed: <span id="downloadSpeedDetails"></span></h2>
+        <h2>Upload Speed: <span id="uploadSpeedDetails"></span></h2>
+    </div>
+    <div class="error-message" id="errorMessage"></div>
+    <!-- Video background -->
+    <video autoplay muted loop id="bgVideo">
+        <source src="/vid.mp4" type="video/mp4" media="(min-width: 600px)">
+        <source src="/vid.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    
+
+    <script>
+        let fetchingSpeedHeaderShown = false;
+
+        async function fetchSpeed() {
+            try {
+                const response = await fetch('http://localhost:3000/run-speed-test');
+                const data = await response.json();
+
+                const downloadSpeedElement = document.getElementById('downloadSpeed');
+                const downloadSpeedDetails = document.getElementById('downloadSpeedDetails');
+                const uploadSpeedDetails = document.getElementById('uploadSpeedDetails');
+                const showMoreInfoBtn = document.getElementById('showMoreInfoBtn');
+                const errorMessage = document.getElementById('errorMessage');
+
+                // Check if the downloadSpeed element has the spinner class
+                if (downloadSpeedElement.classList.contains('spinner')) {
+                    // Remove the spinner class once data is available
+                    downloadSpeedElement.classList.remove('spinner');
+
+                    // Enable the "Show more info" button
+                    showMoreInfoBtn.style.display = 'inline-block';
+                }
+
+                // Display the download speed
+                downloadSpeedElement.innerText = `${data.downloadSpeed.toFixed(2)} Mbps`;
+
+                // Display the download speed details
+                downloadSpeedDetails.innerText = `${data.downloadSpeed.toFixed(2)} Mbps`;
+                uploadSpeedDetails.innerText = `${data.uploadSpeed.toFixed(2)} Mbps`;
+
+                // Hide the error message if it was previously shown
+                errorMessage.innerText = '';
+            } catch (error) {
+                console.error('Error fetching speed data:', error);
+
+                // Display an error message
+                document.getElementById('errorMessage').innerText = 'Unable to test as servers are unreachable. Check your internet connection.';
+
+                // Hide the spinner and details
+                document.getElementById('downloadSpeed').style.display = 'none';
+                document.getElementById('speedDetails').style.display = 'none';
+
+                // Show the error message
+                document.getElementById('errorMessage').style.display = 'block';
+
+                // Hide the "Show more info" button
+                document.getElementById('showMoreInfoBtn').style.display = 'none';
+            }
+        }
+
+        // Fetch speed data initially and set up interval to update every 5 seconds (adjust as needed)
+        fetchSpeed(); // Initial fetch
+        setInterval(fetchSpeed, 4000);
+
+        // Function to toggle visibility of speed details
+        function toggleSpeedDetails() {
+            const speedDetails = document.getElementById('speedDetails');
+
+            // Toggle the visibility of speed details
+            speedDetails.style.display = speedDetails.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+
+</html>
